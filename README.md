@@ -1,6 +1,13 @@
 # MeshLoc
 [//]: # (TODO: Change the paper name to link to arXiv)
-Code for the paper **MeshLoc: Mesh-Based Visual Localization**
+Code repository for the publication:
+```
+V. Panek, Z. Kukelova, T. Sattler.
+MeshLoc: Mesh-Based Visual Localization.
+2022
+```
+
+**arXiv version coming soon**
 
 [//]: # (TODO: Add bibtex reference)
 
