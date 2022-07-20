@@ -132,4 +132,4 @@ Script parameters:
 
 
 ## Acknowledgements
-This repository is heavily using [PoseLib](https://github.com/vlarsson/PoseLib), [RansacLib](https://github.com/tsattler/RansacLib) and [Image Matching Toolbox](https://github.com/GrumpyZhou/image-matching-toolbox/). We would to thank all the contributors of these repositories.
+This repository is heavily using [PoseLib](https://github.com/vlarsson/PoseLib), [RansacLib](https://github.com/tsattler/RansacLib) and [Image Matching Toolbox](https://github.com/GrumpyZhou/image-matching-toolbox/). We would like to thank all the contributors of these repositories.
