@@ -124,9 +124,9 @@ The data repository can be found at [https://data.ciirc.cvut.cz/public/projects/
 You can use [the download script](https://github.com/tsattler/meshloc_release/blob/main/download_meshloc_data.sh) to get all the data easily.
 
 Script parameters:
-- if no parameter are passed, the whole data repository will be downloaded to current directory
-- **-n <all|aachen|12_scenes>** - specifies which dataset to download
-- **-p <string>** - specifies the directory where the data will be downloaded
+- if no parameters are passed, the whole data repository will be downloaded to current directory
+- **-n < all \| aachen \| 12_scenes >** - specifies which dataset to download
+- **-p \< string >** - specifies the directory where the data will be downloaded
 - **-z** - unzips everything and removes the zip files
 
 
