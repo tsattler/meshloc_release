@@ -1,15 +1,5 @@
 # MeshLoc
-[//]: # (TODO: Change the paper name to link to arXiv)
-Code repository for the publication:
-```
-V. Panek, Z. Kukelova, T. Sattler.
-MeshLoc: Mesh-Based Visual Localization.
-2022
-```
-
-**arXiv version coming soon**
-
-[//]: # (TODO: Add bibtex reference)
+This repository contains the code for our publication [MeshLoc: Mesh-Based Visual Localization](https://arxiv.org/abs/2207.10762), which is going to be presented as poster at ECCV 2022.
 
 ## License
 This repository is licensed under the 3-Clause BSD License. See the [LICENSE](https://github.com/tsattler/meshloc_release/blob/main/LICENSE) file for full text.
@@ -119,9 +109,11 @@ List of localization script arguments:
 The pose estimates from the localization pipeline on Aachen v1.1 can be evaluated by benchmark at [https://www.visuallocalization.net/](https://www.visuallocalization.net/). The pose estimates on 12 Scenes can be evaluated by the [https://github.com/tsattler/visloc_pseudo_gt_limitations](https://github.com/tsattler/visloc_pseudo_gt_limitations) repository, which also contains links to 12 Scenes COLMAP models.
 
 ## Data
-The data repository can be found at [https://data.ciirc.cvut.cz/public/projects/2022MeshLoc](https://data.ciirc.cvut.cz/public/projects/2022MeshLoc).
+We used [Aachen v1.1](https://data.ciirc.cvut.cz/public/projects/2020VisualLocalization/Aachen-Day-Night/) and [12 Scenes](http://graphics.stanford.edu/projects/reloc/#data) datasets for the evaluation in our paper.
 
-You can use [the download script](https://github.com/tsattler/meshloc_release/blob/main/download_meshloc_data.sh) to get all the data easily.
+The data derived from the above mentioned datasets (such as meshes, renderings, or COLMAP models) can be found in our data repository at [https://data.ciirc.cvut.cz/public/projects/2022MeshLoc](https://data.ciirc.cvut.cz/public/projects/2022MeshLoc).
+
+You can use [the download script](https://github.com/tsattler/meshloc_release/blob/main/download_meshloc_data.sh) to easily get the whole data repository.
 
 Script parameters:
 - if no parameters are passed, the whole data repository will be downloaded to current directory
@@ -129,7 +121,18 @@ Script parameters:
 - **-p \< string >** - specifies the directory where the data will be downloaded
 - **-z** - unzips everything and removes the zip files
 
-
-
 ## Acknowledgements
 This repository is heavily using [PoseLib](https://github.com/vlarsson/PoseLib), [RansacLib](https://github.com/tsattler/RansacLib) and [Image Matching Toolbox](https://github.com/GrumpyZhou/image-matching-toolbox/). We would like to thank all the contributors of these repositories.
+
+## Citation
+If you are using the code in this repository, please cite the following paper:
+```
+@misc{Panek2022ECCV,
+  author = {Panek, Vojtech and Kukelova, Zuzana and Sattler, Torsten},
+  title = {{MeshLoc: Mesh-Based Visual Localization}},
+  publisher = {arXiv},
+  year = {2022},
+  doi = {10.48550/ARXIV.2207.10762},
+  url = {https://arxiv.org/abs/2207.10762},
+}
+```
