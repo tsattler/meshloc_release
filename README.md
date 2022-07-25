@@ -4,6 +4,17 @@ This repository contains the code for our publication [MeshLoc: Mesh-Based Visua
 ## License
 This repository is licensed under the 3-Clause BSD License. See the [LICENSE](https://github.com/tsattler/meshloc_release/blob/main/LICENSE) file for full text.
 
+## Citation
+If you are using the code in this repository, please cite the following paper:
+```
+@inproceedings{Panek2022ECCV,
+  author = {Panek, Vojtech and Kukelova, Zuzana and Sattler, Torsten},
+  title = {{MeshLoc: Mesh-Based Visual Localization}},
+  booktitle={European Conference on Computer Vision (ECCV)},
+  year = {2022},
+}
+```
+
 ## Installation
 - follow [Image Matching Toolbox](https://github.com/GrumpyZhou/image-matching-toolbox/blob/main/docs/install.md) installation guide
 	- clone the repository (`git clone https://github.com/GrumpyZhou/image-matching-toolbox.git`)
@@ -124,15 +135,4 @@ Script parameters:
 ## Acknowledgements
 This repository is heavily using [PoseLib](https://github.com/vlarsson/PoseLib), [RansacLib](https://github.com/tsattler/RansacLib) and [Image Matching Toolbox](https://github.com/GrumpyZhou/image-matching-toolbox/). We would like to thank all the contributors of these repositories.
 
-## Citation
-If you are using the code in this repository, please cite the following paper:
-```
-@misc{Panek2022ECCV,
-  author = {Panek, Vojtech and Kukelova, Zuzana and Sattler, Torsten},
-  title = {{MeshLoc: Mesh-Based Visual Localization}},
-  publisher = {arXiv},
-  year = {2022},
-  doi = {10.48550/ARXIV.2207.10762},
-  url = {https://arxiv.org/abs/2207.10762},
-}
-```
+
