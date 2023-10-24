@@ -286,22 +286,14 @@ def main():
     parser.add_argument("--retrieval_pairs", type=str, help="Text file with results of retrieval")
     parser.add_argument("--top_k", type=int, help="Number of top-ranked images to use")
     parser.add_argument("--reproj_error", type=float, help="Reprojection error threshold for RANSAC")
-    parser.add_argument("--use_orig_db_images", type=bool, default=False, required=False, help="Use real or rendered database images.")
-    # parser.add_argument("--use_orig_db_intrinsics", type=bool, default=False, required=False, help="Use original database image intrinsics.")
-    parser.add_argument("--triangulate", type=bool, default=False, required=False, help="Use triangulation instead of 3D points from depth maps.")
-    parser.add_argument("--merge_3D_points", type=bool, default=False, required=False, help="If multiple 3D points are available per query feature, whether to select one or not.")
-    parser.add_argument("--cluster_keypoints", type=bool, default=False, required=False, help="Whether to cluster keypoints. Only applicable for patch2pix at the moment.")
-    parser.add_argument("--covisibility_filtering", type=bool, default=False, required=False, help="Use covisibility filtering or not.")
-    parser.add_argument("--all_matches_ransac", type=bool, default=False, required=False, help="Use all possible 2D-3D matches in RANSAC.")
+    parser.add_argument("--use_orig_db_images", action="store_true", help="Use real or rendered database images.")
+    parser.add_argument("--triangulate", action="store_true", help="Use triangulation instead of 3D points from depth maps.")
+    parser.add_argument("--merge_3D_points", action="store_true", help="If multiple 3D points are available per query feature, whether to select one or not.")
+    parser.add_argument("--cluster_keypoints", action="store_true", help="Whether to cluster keypoints. Only applicable for patch2pix at the moment.")
+    parser.add_argument("--covisibility_filtering", action="store_true", help="Use covisibility filtering or not.")
+    parser.add_argument("--all_matches_ransac", action="store_true", help="Use all possible 2D-3D matches in RANSAC.")
     parser.add_argument("--min_ransac_iterations", type=int, default=1000, required=False, help="Minimum number of RANSAC iterations.")
     parser.add_argument("--max_ransac_iterations", type=int, default=100000, required=False, help="Maximum number of RANSAC iterations.")
-    # parser.add_argument("--use_mean_match", type=bool, default=False, required=False, help="Use mean matching point.")
-    # parser.add_argument("--use_single_match", type=bool, default=False, required=False, help="Select single matching 3D point.")
-    # parser.add_argument("--use_single_match_from_neighbors", type=bool, default=False, required=False, help="Select single matching 3D point, selecting the 3D point from a small neighborhood that minimizes a robust reprojection error.")
-    # parser.add_argument("--write_out_matches", type=bool, default=False, required=False, help="Writes out all matches for each query image.")
-    # parser.add_argument("--per_image_ransac", type=bool, default=False, required=False, help="Run RANSAC for each retrieved image individually.")
-    # parser.add_argument("--window_size", type=int, default=0, required=False, help="Window size when sampling additional points")
-    # parser.add_argument("--simple_covisibility_filter", type=bool, default=False, required=False, help="Simple covisibility filter based on similar poses")
     parser.add_argument("--max_side_length", type=int, default=800, required=False, help="Maximum side length to use for queries, -1 for original resolution")
     parser.add_argument("--ransac_type", type=str, default="MSAC", required=False, help="RANSAC type: MSAC, EFFSAC, or PYCOLMAP")
     parser.add_argument("--match_prefix", type=str, required=True, help="Contains the directory name and a prefix for the filenames that will be used to write out matches")
@@ -310,7 +302,6 @@ def main():
     parser.add_argument("--refinement_step", type=float, default=0.25, help="Step size for the +REF refinement")
     parser.add_argument("--bias_x", type=float, default=0.0, help="Bias term for x-direction for feature detections")
     parser.add_argument("--bias_y", type=float, default=0.0, help="Bias term for y-direction for feature detections")
-    # parser.add_argument("--simple_scc_threshold", type=np.float32, default=-1.0, required=False, help="Threshold for a simple spatial consistency check. Set to -1 to disable.")
     args = parser.parse_args()
     print(args)
 
@@ -336,19 +327,15 @@ def main():
             # NetVLAD retrieval pairs format
             q_name, db_name = retrieval_pairs[i].split(' ')
 
-        # q_name = q_name.split('/')[-1]
-        # db_name = db_name.replace('/', '_')
         if q_name not in retrieval_results:
             retrieval_results[q_name] = []
         retrieval_results[q_name].append(db_name)
 
     # maximum side length of the query images
     max_side_length = np.float32(args.max_side_length)
-    # max_side_length = -1
 
     # load the reference camera poses
     print('Loading the reference poses')
-    # cameras, images = read_model('/content/drive/MyDrive/data/experiments/visual_localization_with_meshes/aachen/3D-models/empty/')
     cameras, images = read_model(args.colmap_model_dir)
     print('Found %d images and %d cameras' % (len(images), len(cameras)))
 
@@ -382,7 +369,6 @@ def main():
             class_name = imm_args['class']
         # Init model
         model = immatch.__dict__[class_name](imm_args)
-        # model.match_threshold = 0.0
         matcher = lambda im1, im2: model.match_pairs(im1, im2)
     method = args.method_string
 
@@ -407,8 +393,6 @@ def main():
                                    np.float32(q_data[4]) * scaling_factor,
                                    np.float32(q_data[5]) * scaling_factor,
                                    np.float32(q_data[6])]}
-        query_fx = np.float32(q_data[3]) * scaling_factor
-        query_fy = np.float32(q_data[4]) * scaling_factor
 
         retrieved_db = retrieval_results[q_name]
 
@@ -419,7 +403,7 @@ def main():
         matches_per_feat = {}
 
 
-        for j in range(0, num_top_ranked): #len(retrieved_db)):
+        for j in range(0, num_top_ranked):
             q_name_base = q_name.split('/')[-1]
             db_name_underscore = retrieved_db[j].replace('/', '_')
 
@@ -466,7 +450,6 @@ def main():
             img2_id = map_db_name_to_id[retrieved_db[j]]
             T = np.identity(4)
             R = np.asmatrix(qvec2rotmat(images[img2_id].qvec)).transpose()
-            # print(qvec2rotmat(images[img2_id].qvec))
             T[0:3,0:3] = R
             T[0:3,3] = -R.dot(images[img2_id].tvec)
             P = np.zeros((3,4))
@@ -521,7 +504,7 @@ def main():
 
             matches[:, 2:] += np.array([args.bias_x, args.bias_y])
 
-            kpts1 = matches[:, :2]
+            # kpts1 = matches[:, :2]
             kpts2 = matches[:, 2:]
 
             # Get the corresponding depth values.
@@ -531,7 +514,6 @@ def main():
             depth_values = depth_map[kpts2_int[:,1], kpts2_int[:,0]]
 
             # Assumes that the images use the PINHOLE camera model
-            # print(colmap_cam.params)
             fx = colmap_cam.params[0]
             fy = colmap_cam.params[1]
             cx = colmap_cam.params[2]
@@ -549,15 +531,9 @@ def main():
 
             for m in range(0, matches.shape[0]):
                 m_key = tuple([matches[m, 0], matches[m, 1]])
-                # print(window_size)
                 xr = np.arange(max(0, np.floor(matches[m, 2])), min(colmap_cam.width - 1, np.floor(matches[m, 2]) + 2)).astype(int)
                 yr = np.arange(max(0, np.floor(matches[m, 3])), min(colmap_cam.height - 1, np.floor(matches[m, 3]) + 2)).astype(int)
                 xx, yy = np.meshgrid(xr, yr)
-                # print(matches[m,:])
-                # print(xx)
-                # print(yy)
-                # xx = min(max(0, np.rint(matches[m, 0]), colmap_cam.width - 1))
-                # yy = min(max(0, np.rint(matches[m, 1]), colmap_cam.height - 1))
                 D = depth_map[yy, xx]
                 delta_x = matches[m, 2] - np.floor(matches[m, 2])
                 delta_y = matches[m, 3] - np.floor(matches[m, 3])
@@ -570,22 +546,9 @@ def main():
                 else:
                     depth_m = 0.0
 
-                # print(D.shape)
                 rays_ = np.array([(matches[m, 2] - cx) / fx, (matches[m, 3] - cy) / fy, 1.0]).transpose()
-                # rays_ = np.array([xx.flatten(), yy.flatten(), np.ones(D.flatten().shape[0])]).transpose()
-                # print(rays_.shape)
-                # rays_[:,:2] = rays_[:,:2] - np.array([cx, cy])
-                # rays_[:,:2] = rays_[:,:2] - np.array([cx, cy])
-                # rays_[:,0] /= fx
-                # rays_[:,1] /= fy
-                # points_3D_m = rays_ * D.flatten().reshape(-1,1)
                 points_3D_m = rays_ * depth_m
-                # print(points_3D_m)
-                # print(points3D)
-                # points_3D_world_m = np.matmul(T, np.append(points_3D_m, np.ones([points_3D_m.shape[0], 1]), axis=1).transpose()).transpose()[:, :3]
                 points_3D_world_m = np.matmul(T, np.array([points_3D_m[0], points_3D_m[1], points_3D_m[2], 1.0]).transpose()).transpose()[:3]
-                # print(points_3D_world_m)
-                # print(points_3D_world_m.shape)
 
                 m_key = tuple([matches[m, 0], matches[m, 1]])
                 pt = points3D_world[m, :]
@@ -605,22 +568,6 @@ def main():
         for m_key in matches_per_feat.keys():
             matches.append(matches_per_feat[m_key])
 
-        # print(matches[0])
-
-        # print(len(matches))
-        # if args.ransac_type == 'PYCOLMAP':
-        #     matches_2D3D = np.empty((0,5))
-        #     for m in range(0, len(matches)):
-        #         pts_3D = matches[m]['points']
-        #         pts_2D = np.tile(matches[m]['keypoint'].reshape(1,2),
-        #                          (pts_3D.shape[0], 1))
-        #         matches_2D3D = np.append(matches_2D3D, np.append(pts_2D, pts_3D, axis=1), axis=0)
-
-        #     print(' Applying PyColmap on %d matches' % matches_2D3D.shape[0])
-        #     estimate = pycolmap.absolute_pose_estimation(matches_2D3D[:, :2].astype(np.float64),
-        #                                                  matches_2D3D[:,2:].astype(np.float64),
-        #                                                  camera_dict, reproj_error)
-        # else:
         pose_options = {'triangulate' : args.triangulate,
                         'merge_3D_points' : args.merge_3D_points,
                         'cluster_keypoints' : args.cluster_keypoints,
@@ -636,16 +583,14 @@ def main():
 
         estimate = meshloc.pose_estimation(camera_dict, top_ranked_cameras,
                                            matches, pose_options)
-        # print(estimate)
+        
         if estimate['success']:
             if best_inliers[q_name] < estimate['num_inliers']:
                 poses[q_name] = (estimate['qvec'], estimate['tvec'])
                 best_inliers[q_name] = estimate['num_inliers']
-            # np.savetxt('/content/drive/MyDrive/data/experiments/visual_localization_with_meshes/aachen/tmp/' + q_name.split('.')[0] + '_inliers.xyz', matches_2D3D[estimate['inliers'],2:], delimiter=' ')
-            # poses[q_name] = (estimate['qvec'], estimate['tvec'])
+            
             print(estimate['qvec'])
             print(estimate['tvec'])
-            # print('    RansacLib: Found %d inliers from %d matches.' % (estimate['num_inliers'], len(matches)))
 
     # Writes out the poses. Code taken from
     # https://github.com/cvg/Hierarchical-Localization/blob/master/hloc/localize_sfm.py#L192
@@ -664,9 +609,7 @@ def main():
     pose_file = pose_file + "_min_" + str(args.min_ransac_iterations) + "_max_" + str(args.max_ransac_iterations)
     pose_file = pose_file + "_ref_" + str(args.refinement_range) + "_" + str(args.refinement_step)
     pose_file = pose_file + "_bias_" + str(args.bias_x) + "_" + str(args.bias_y)
-    # if args.use_single_match_from_neighbors:
-        # pose_file = pose_file + "_single_match_from_neighbors_window_size_" + str(args.window_size)
-    # pose_file = pose_file +  "_scc_" + str(args.simple_scc_threshold) + ".txt"
+    
     print(pose_file)
     with open(pose_file, 'w') as f:
         for q in poses:

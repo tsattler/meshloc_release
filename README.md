@@ -39,7 +39,7 @@ cd <image_matching_toolbox_dir>
 conda activate immatch
 
 python3 <mesh_loc_dir>/localize.py \
---db_image_dir <aachen_dataset_path>/images_upright \
+--db_image_dir <meshloc_dataset_path>/aachen_day_night_v11/images/images_db_undist_800 \
 --db_depth_image_dir <meshloc_dataset_path>/aachen_day_night_v11/db_renderings/AC14_depth_orig_undist \
 --colmap_model_dir <meshloc_dataset_path>/aachen_day_night_v11/db_colmap_models/orig_undist \
 --query_dir <aachen_dataset_path>/images_upright \
@@ -56,8 +56,8 @@ python3 <mesh_loc_dir>/localize.py \
 --min_ransac_iterations 10000 \
 --max_ransac_iterations 100000 \
 --reproj_error 20.0 \
---use_orig_db_images True \
---cluster_keypoints True
+--use_orig_db_images \
+--cluster_keypoints
 ```
 
 Example on 12 Scenes dataset:
@@ -84,7 +84,7 @@ python3 <mesh_loc_dir>/localize_12scenes.py \
 --min_ransac_iterations 10000 \
 --max_ransac_iterations 100000 \
 --reproj_error 20.0 \
---use_orig_db_images True
+--use_orig_db_images
 ```
 
 List of localization script arguments:
@@ -106,11 +106,11 @@ List of localization script arguments:
 - **min_ransac_iterations** = minimum number of RANSAC iterations
 - **max_ransac_iterations** = maximum number of RANSAC iterations
 - **reproj_error** = reprojection error RANSAC threshold
-- **use_orig_db_images** = set True if using original images (not renderings) for `db_image_dir` 
-- **triangulate** = set True to use triangulation instead of 3D points from depth maps
-- **merge_3D_points** = set True to select one of multiple 3D points available per query feature
-- **cluster_keypoints** = set True to cluster keypoints (applicable only for patch2pix)
-- **covisibility_filtering** = set True to use covisibility filtering
+- **use_orig_db_images** = set if using original images (not renderings) for `db_image_dir` 
+- **triangulate** = set to use triangulation instead of 3D points from depth maps
+- **merge_3D_points** = set to select one of multiple 3D points available per query feature
+- **cluster_keypoints** = set to cluster keypoints (applicable only for patch2pix)
+- **covisibility_filtering** = set to use covisibility filtering
 - **all_matches_ransac** = use all possible 2D-3D matches in RANSAC
 - **refinement_range** = range for the +REF refinement
 - **refinement_step** = step size for the +REF refinement
