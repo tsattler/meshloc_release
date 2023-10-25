@@ -40,16 +40,16 @@ conda activate immatch
 
 python3 <mesh_loc_dir>/localize.py \
 --db_image_dir <meshloc_dataset_path>/aachen_day_night_v11/images/images_db_undist_800 \
---db_depth_image_dir <meshloc_dataset_path>/aachen_day_night_v11/db_renderings/AC14_depth_orig_undist \
---colmap_model_dir <meshloc_dataset_path>/aachen_day_night_v11/db_colmap_models/orig_undist \
---query_dir <aachen_dataset_path>/images_upright \
---query_list <meshloc_dataset_path>/aachen_day_night_v11/night_time_queries_with_intrinsics.txt \
+--db_depth_image_dir <meshloc_dataset_path>/aachen_day_night_v11/db_renderings/AC14_depth_800_undist \
+--colmap_model_dir <meshloc_dataset_path>/aachen_day_night_v11/db_colmap_models/800_undist \
+--query_dir <meshloc_dataset_path>/aachen_day_night_v11/images/images_q_night_800 \
+--query_list <meshloc_dataset_path>/aachen_day_night_v11/night_time_queries_with_intrinsics_800_basenames.txt \
 --out_prefix <experiment_outputs_dir_path> \
 --match_prefix <experiment_matches_dir_path> \
 --method_name patch2pix \
 --method_config aachen_v1_1 \
 --method_string patch2pix_aachen_v1_1_ \
---retrieval_pairs <meshloc_dataset_path>/aachen_day_night_v11/retrieval_pairs/NetVLAD_top50.txt \
+--retrieval_pairs <meshloc_dataset_path>/aachen_day_night_v11/retrieval_pairs/NetVLAD_top50_underscores.txt \
 --top_k 50 \
 --max_side_length -1 \
 --ransac_type POSELIB+REF \
