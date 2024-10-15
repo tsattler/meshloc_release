@@ -15,6 +15,7 @@ from setuptools import setup, Extension
 from setuptools.command.build_ext import build_ext
 from distutils.version import LooseVersion
 
+import multiprocessing
 
 class CMakeExtension(Extension):
     def __init__(self, name, sourcedir=''):
@@ -62,7 +63,7 @@ class CMakeBuild(build_ext):
             build_args += ['--', '/m']
         else:
             cmake_args += ['-DCMAKE_BUILD_TYPE=' + cfg]
-            build_args += ['--', '-j2']
+            build_args += ['--', '-j{}'.format(multiprocessing.cpu_count() - 1)]
 
             if platform.system() == "Darwin":
                 cmake_args += ['-DOpenMP_CXX_FLAGS="-Xclang -fopenmp"']
@@ -87,8 +88,11 @@ setup(
     author='Torsten Sattler',
     author_email='torsten.sattler@cvut.cz',
     description='Python bindings for localization helpers',
-    long_description='',
     ext_modules=[CMakeExtension('src')],
     cmdclass=dict(build_ext=CMakeBuild),
     zip_safe=False,
+    install_requires=[
+        "pyyaml",
+        "numpy < 2.0.0",
+    ],
 )

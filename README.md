@@ -1,5 +1,5 @@
 # MeshLoc
-This repository contains the code for our publication [MeshLoc: Mesh-Based Visual Localization](https://arxiv.org/abs/2207.10762), which is going to be presented as poster at ECCV 2022.
+This repository contains the code for our publication [MeshLoc: Mesh-Based Visual Localization](https://arxiv.org/abs/2207.10762), presented at ECCV 2022.
 
 ## License
 This repository is licensed under the 3-Clause BSD License. See the [LICENSE](https://github.com/tsattler/meshloc_release/blob/main/LICENSE) file for full text.
@@ -16,18 +16,31 @@ If you are using the code in this repository, please cite the following paper:
 ```
 
 ## Installation
-- follow [Image Matching Toolbox](https://github.com/GrumpyZhou/image-matching-toolbox/blob/main/docs/install.md) installation guide
-	- clone the repository (`git clone https://github.com/GrumpyZhou/image-matching-toolbox.git`)
-	- prepare `immatch` conda environment (`conda env create -f environment.yml`)
-	- activate the `immatch` environment (`conda activate immatch`)
-	- install immatch toolbox as Python package (`python setup.py develop`)
-		- possibly update of [PyTorch](https://pytorch.org/get-started/locally/) package will be necessary (e.g. `conda install pytorch torchvision torchaudio cudatoolkit=10.2 -c pytorch`)
-- install other necessary packages to `immatch` environment (`conda install pyyaml`)
-- clone the MeshLoc repository
-    - `git clone --recurse-submodules https://github.com/tsattler/meshloc_release.git`
-- install mesh_loc Python package to `immatch` environment 
-	- `cd <mesh_loc_dir>`
-	- `python setup.py develop`
+This version of MeshLoc uses the Image Matching Toolbox for feature matching. Immatch package unfortunately cannot be directly installed as a package from GitHub due to the way it downloads the individual matching methods as submodules. Therefore, it has to be installed from the source. The full installation process is as follows:
+
+```
+git clone https://github.com/GrumpyZhou/image-matching-toolbox.git
+cd image-matching-toolbox
+git submodule update --init
+conda env create --name immatch python=3.7
+conda activate immatch
+pip install Cython loguru jupyter scipy matplotlib opencv-python torch==1.13.1 torchvision pytorch-lightning faiss-gpu h5py==3.6.0
+pip install -e .
+cd pretrained
+bash download.sh
+cd ../..
+git clone --recurse-submodules https://github.com/tsattler/meshloc_release.git
+cd meshloc_release
+pip install -e .
+```
+
+In case the Image Matching Toolbox fails to download the pretrained models, you might need to switch to a more recent branch of the submodules. Example for Patch2Pix:
+
+```
+cd image-matching-toolbox/third_party/patch2pix
+git checkout main
+```
+
 
 ## Usage
 Current implementation contains localization scripts for two datasets - [Aachen v1.1](https://data.ciirc.cvut.cz/public/projects/2020VisualLocalization/Aachen-Day-Night/) and [12 Scenes](http://graphics.stanford.edu/projects/reloc/). The scripts should be launched from `image-matching-toolbox` directory so the scripts have direct access to the feature matching configuration files. Also activate the prepared `immatch` conda environment with all necessary packages.
@@ -124,7 +137,7 @@ We used [Aachen v1.1](https://data.ciirc.cvut.cz/public/projects/2020VisualLocal
 
 The data derived from the above mentioned datasets (such as meshes, renderings, or COLMAP models) can be found in our data repository at [https://data.ciirc.cvut.cz/public/projects/2022MeshLoc](https://data.ciirc.cvut.cz/public/projects/2022MeshLoc).
 
-You can use [the download script](https://github.com/tsattler/meshloc_release/blob/main/download_meshloc_data.sh) to easily get the whole data repository.
+You can use [the download script](https://github.com/tsattler/meshloc_release/blob/main/download_meshloc_data.sh) to easily get the meshes and renderings. You still need to download the original datasets (photos and camera information) from their respective websites.
 
 Script parameters:
 - if no parameters are passed, the whole data repository will be downloaded to current directory

@@ -7,7 +7,13 @@ find_package (Eigen3 REQUIRED)
 
 find_package (Ceres REQUIRED)
 
-find_package (COLMAP REQUIRED)
+find_package (colmap REQUIRED)
+
+find_package( TIFF REQUIRED )
+if ( TIFF_FOUND )
+    include_directories( ${TIFF_INCLUDE_DIRS} )
+    list(APPEND COLMAP_EXTERNAL_LIBRARIES ${TIFF_LIBRARIES})
+endif( TIFF_FOUND )
 
 include_directories (
   ${CMAKE_SOURCE_DIR}
@@ -36,6 +42,4 @@ file(GLOB POSELIB_SRC
 
 pybind11_add_module(meshloc main.cc absolute_pose_estimator.h absolute_pose_estimator.cc multi_absolute_pose_estimator.h multi_absolute_pose_estimator.cc utils.h utils.cc ${POSELIB_SRC})
 
-# pybind11_add_module(meshloc main.cc absolute_pose_estimator.h absolute_pose_estimator.cc multi_absolute_pose_estimator.h multi_absolute_pose_estimator.cc utils.h utils.cc ${CMAKE_SOURCE_DIR}/PoseLib/PoseLib/types.h ${CMAKE_SOURCE_DIR}/PoseLib/PoseLib/camera_pose.h ${CMAKE_SOURCE_DIR}/PoseLib/PoseLib/solvers/p3p.h ${CMAKE_SOURCE_DIR}/PoseLib/PoseLib/solvers/p3p.cc ${CMAKE_SOURCE_DIR}/PoseLib/PoseLib/misc/colmap_models.h ${CMAKE_SOURCE_DIR}/PoseLib/PoseLib/misc/colmap_models.cc ${CMAKE_SOURCE_DIR}/PoseLib/PoseLib/robust/bundle.h ${CMAKE_SOURCE_DIR}/PoseLib/PoseLib/robust/bundle.cc ${CMAKE_SOURCE_DIR}/PoseLib/PoseLib/robust/ransac.h ${CMAKE_SOURCE_DIR}/PoseLib/PoseLib/robust/ransac.cc ${CMAKE_SOURCE_DIR}/PoseLib/PoseLib/robust/utils.h ${CMAKE_SOURCE_DIR}/PoseLib/PoseLib/robust/utils.cc ${CMAKE_SOURCE_DIR}/PoseLib/PoseLib/robust/sampling.h ${CMAKE_SOURCE_DIR}/PoseLib/PoseLib/robust/sampling.cc ${CMAKE_SOURCE_DIR}/PoseLib/PoseLib/robust.h ${CMAKE_SOURCE_DIR}/PoseLib/PoseLib/robust.cc)
-#pybind11_add_module(meshloc main.cc)
-target_link_libraries(meshloc PRIVATE ${CERES_LIBRARIES} ${COLMAP_LIBRARIES})
+target_link_libraries(meshloc PRIVATE ${CERES_LIBRARIES} colmap::colmap Eigen3::Eigen)

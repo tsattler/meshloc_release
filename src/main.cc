@@ -29,26 +29,12 @@
 
 #include <pybind11/pybind11.h>
 
-// #include "simple_pose_estimation.cc"
 #include "pose_estimation.cc"
 
 namespace py = pybind11;
 
 PYBIND11_MODULE(meshloc, m) {
     m.doc() = "Python bindings for localization helpers";
-
-    // m.def("simple_pose_estimation", &simple_pose_estimation, 
-    //       py::arg("camera_type"),
-    //       py::arg("camera_intrinsics"), 
-    //       py::arg("points2D"),
-    //       py::arg("points3D"),
-    //       py::arg("priors"),
-    //       py::arg("inlier_threshold"),
-    //       py::arg("num_LO_iters"),
-    //       py::arg("min_num_iterations"),
-    //       py::arg("max_num_iterations"),
-    //       "Absolute pose estimation, followed by non-linear refinement.");
-
     m.def("pose_estimation", &pose_estimation, 
           py::arg("query_camera"),
           py::arg("db_cams"), 

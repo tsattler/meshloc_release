@@ -285,7 +285,7 @@ def main():
     parser.add_argument("--query_dir", type=str, help="Directory with query images")
     parser.add_argument("--retrieval_pairs", type=str, help="Text file with results of retrieval")
     parser.add_argument("--top_k", type=int, help="Number of top-ranked images to use")
-    parser.add_argument("--reproj_error", type=float, help="Reprojection error threshold for RANSAC")
+    parser.add_argument("--reproj_error", type=float, default=12.0, help="Reprojection error threshold for RANSAC")
     parser.add_argument("--use_orig_db_images", action="store_true", help="Use real or rendered database images.")
     parser.add_argument("--triangulate", action="store_true", help="Use triangulation instead of 3D points from depth maps.")
     parser.add_argument("--merge_3D_points", action="store_true", help="If multiple 3D points are available per query feature, whether to select one or not.")
@@ -447,7 +447,7 @@ def main():
             depth_map = np.load(img2_depth)['depth'].astype(np.float32)
 
             # Get the transformation from reference camera to world coordinates
-            img2_id = map_db_name_to_id[retrieved_db[j]]
+            img2_id = map_db_name_to_id[retrieved_db[j].strip()]
             T = np.identity(4)
             R = np.asmatrix(qvec2rotmat(images[img2_id].qvec)).transpose()
             T[0:3,0:3] = R

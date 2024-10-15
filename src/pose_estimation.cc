@@ -47,9 +47,10 @@
 
 #include <RansacLib/ransac.h>
 
-#include <colmap/base/camera.h>
+#include <colmap/scene/camera.h>
+#include <colmap/sensor/models.h>
 #include <colmap/estimators/pose.h>
-// #include "colmap/util/random.h"
+#include <colmap/geometry/rigid3.h>
 
 #include <PoseLib/camera_pose.h>
 #include <PoseLib/misc/colmap_models.h>
@@ -225,23 +226,11 @@ py::dict pose_estimation(
 
   ////
   // Data preparation.
-  // std::cout << " Starting to cast" << std::endl;
   for (int i = 0; i < kNumInitialMatches; ++i) {
-    // std::cout << " Trying to cast keypoint" << std::endl;
     query_keypoints[i] = matches[i]["keypoint"].cast<Eigen::Vector2d>();
-    // std::cout << " Trying to cast points" << std::endl;
     points[i] = matches[i]["points"].cast<std::vector<Eigen::Vector3d>>();
-    // std::cout << " Trying to cast observations" << std::endl;
     db_observations[i] = matches[i]["observations"].cast<std::vector<Eigen::Vector2d>>();
-    // std::cout << " Trying to cast db_indices" << std::endl;
     camera_indices[i] = matches[i]["db_indices"].cast<std::vector<int>>();
-
-    // if (i == 0) {
-    //   std::cout << query_keypoints[i].transpose() << std::endl;
-    //   std::cout << points[i].size() << " " << points[i][0].transpose() << std::endl;
-    //   std::cout << db_observations[i].size() << " " << db_observations[i][0].transpose() << std::endl;
-    //   std::cout << camera_indices[i].size() << " " << camera_indices[i][0] << std::endl;
-    // }
   }
 
   ////
@@ -314,8 +303,6 @@ py::dict pose_estimation(
                 << "points." << std::endl;
     }
   } else if (pose_options["triangulate"].cast<bool>()) {
-// 
-  // } else if (triangulate) {
     for (int i = 0; i < num_keypoints; ++i) {
       Eigen::Vector3d X;
       std::vector<int> inlier_indices;
@@ -454,7 +441,6 @@ py::dict pose_estimation(
                                             points2D_aggreg_, rays_aggreg, 
                                             points3D_aggreg_, 10);
 
-
     LocallyOptimizedMSAC<CameraPose, CameraPoses,
                          AbsolutePoseEstimator> lomsac;
     LocallyOptimizedEffectiveRANSAC<CameraPose, CameraPoses,
@@ -464,14 +450,12 @@ py::dict pose_estimation(
 
     ransac_lib::RansacStatistics ransac_stats;
     CameraPose best_model;
-
-    colmap::Camera colmap_camera;
-    colmap_camera.SetModelIdFromName("PINHOLE");
-    colmap_camera.SetWidth(kWidth);
-    colmap_camera.SetHeight(kHeight);
-    std::vector<double> colmap_cam_params = {cam.focal_x, cam.focal_y,
-                                             cam.c_x, cam.c_y};
-    colmap_camera.SetParams(colmap_cam_params);
+    colmap::Camera colmap_camera = colmap::Camera::CreateFromModelName(
+        1, "PINHOLE", cam.focal_x, kWidth, kHeight);
+    colmap_camera.SetFocalLengthX((double)cam.focal_x);
+    colmap_camera.SetFocalLengthY((double)cam.focal_y);
+    colmap_camera.SetPrincipalPointX((double)cam.c_x);
+    colmap_camera.SetPrincipalPointY((double)cam.c_y);
 
     colmap::AbsolutePoseEstimationOptions colmap_abs_pose_options;
     colmap_abs_pose_options.estimate_focal_length = false;
@@ -508,19 +492,15 @@ py::dict pose_estimation(
           loeffsac.EstimateModel(options, solver, &best_model, &ransac_stats);
     } else if (ransac_type.compare("PYCOLMAP") == 0) {
       
-
-      Eigen::Vector4d q_vec;
-      Eigen::Vector3d t_vec;
+      colmap::Rigid3d est_pose;
       size_t num_colmap_inliers;
       for (int i = 0; i < kNumMatches; ++i) {
         points2D_[i] += Eigen::Vector2d(cam.c_x, cam.c_y);
       }
 
-      // std::vector<Eigen::Vector3d> points3D_colmap;
-      // points3D_colmap.assign(points3D_.begin(), points3D_.end());
       if (!colmap::EstimateAbsolutePose(colmap_abs_pose_options,
                                         points2D_, points3D_,
-                                        &q_vec, &t_vec, &colmap_camera,
+                                        &est_pose, &colmap_camera,
                                         &num_colmap_inliers,
                                         &colmap_inlier_mask)) {
         num_ransac_inliers = 0;
@@ -529,7 +509,7 @@ py::dict pose_estimation(
         if (!colmap::RefineAbsolutePose(colmap_refinement_options,
                                         colmap_inlier_mask,
                                         points2D_, points3D_,
-                                        &q_vec, &t_vec, &colmap_camera)) {
+                                        &est_pose, &colmap_camera)) {
           num_ransac_inliers = 0;
         } else {
           auto ransac_end = std::chrono::system_clock::now();
@@ -539,8 +519,10 @@ py::dict pose_estimation(
           std::cout << "   ... " << ransac_type << " took " 
                     << elapsed_seconds.count() << " s" << std::endl;
           result_dict["success"] = true;
-          result_dict["qvec"] = q_vec;
-          result_dict["tvec"] = t_vec;
+          Eigen::Vector4d q_vec_wxyz;
+          q_vec_wxyz << est_pose.rotation.w(), est_pose.rotation.x(), est_pose.rotation.y(), est_pose.rotation.z();
+          result_dict["qvec"] = q_vec_wxyz;
+          result_dict["tvec"] = est_pose.translation;
           result_dict["num_inliers"] = num_colmap_inliers;
           std::vector<bool> colmap_inliers;
           for (auto it : colmap_inlier_mask) {
@@ -606,8 +588,7 @@ py::dict pose_estimation(
       Eigen::Vector3d t = -R * best_model.col(3);
       Eigen::Quaterniond q(R);
       q.normalize();
-      Eigen::Vector4d q_vec(q.w(), q.x(), q.y(), q.z());
-      Eigen::Vector3d t_vec = t;
+      colmap::Rigid3d colmap_pose(q, t);
       colmap_inlier_mask.resize(kNumMatches, false);
       for (int inl : ransac_stats.inlier_indices) {
         colmap_inlier_mask[inl] = true;
@@ -616,12 +597,9 @@ py::dict pose_estimation(
       if (colmap::RefineAbsolutePose(colmap_refinement_options,
                                      colmap_inlier_mask,
                                      points2D_, points3D_,
-                                     &q_vec, &t_vec, &colmap_camera)) {
-        Eigen::Quaterniond qq;
-        qq.w() = q_vec[0];
-        qq.x() = q_vec[1];
-        qq.y() = q_vec[2];
-        qq.z() = q_vec[3];
+                                     &colmap_pose, &colmap_camera)) {
+        Eigen::Quaterniond qq = colmap_pose.rotation;
+        Eigen::Vector3d t_vec = colmap_pose.translation;
         best_model.topLeftCorner<3, 3>() = qq.toRotationMatrix();
         best_model.col(3) = -best_model.topLeftCorner<3, 3>().transpose() * t_vec;
       }
@@ -662,7 +640,6 @@ py::dict pose_estimation(
 
             total_num_inliers_xyz += num_inliers_xyz;
             c_weighted += c_xyz * static_cast<double>(num_inliers_xyz);
-            // std::cout << "   " << num_inliers_xyz << " " << (c_xyz - best_model.col(3)).norm() << " " << num_ransac_inliers << std::endl;
           }
         } 
       }
@@ -684,8 +661,6 @@ py::dict pose_estimation(
               << ransac_stats.number_lo_iterations
               << " local optimization stages" << std::endl;
 
-    //    if (num_ransac_inliers < 12) continue;
-
     Eigen::Matrix3d R = best_model.topLeftCorner<3, 3>();
     Eigen::Vector3d t = -R * best_model.col(3);
     Eigen::Quaterniond q(R);
@@ -697,7 +672,7 @@ py::dict pose_estimation(
       result_dict["tvec"] = t;
       result_dict["num_inliers"] = num_ransac_inliers;
       result_dict["inliers"] = ransac_stats.inlier_indices;
-    }    
+    }
   }
   
   return result_dict;
