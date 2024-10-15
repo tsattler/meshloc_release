@@ -16,7 +16,9 @@ If you are using the code in this repository, please cite the following paper:
 ```
 
 ## Installation
-This version of MeshLoc uses the Image Matching Toolbox for feature matching. Immatch package unfortunately cannot be directly installed as a package from GitHub due to the way it downloads the individual matching methods as submodules. Therefore, it has to be installed from the source. The full installation process is as follows:
+Make sure you have [COLMAP](https://colmap.github.io/index.html) installed on your system. If not, please follow the instructions on the [COLMAP website](https://colmap.github.io/install.html). The current version of MeshLoc was tested with COLMAP 3.11, but should be compatible with any version >= 3.9.
+
+This version of MeshLoc uses the [Image Matching Toolbox](https://github.com/GrumpyZhou/image-matching-toolbox) for feature matching. Immatch package unfortunately cannot be directly installed as a package from GitHub due to the way it downloads the individual matching methods as submodules. Therefore, it has to be installed from the source. The full installation process is as follows:
 
 ```
 git clone https://github.com/GrumpyZhou/image-matching-toolbox.git
