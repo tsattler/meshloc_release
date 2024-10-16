@@ -62,7 +62,7 @@ python3 <mesh_loc_dir>/localize.py \
 --out_prefix <experiment_outputs_dir_path> \
 --match_prefix <experiment_matches_dir_path> \
 --method_name patch2pix \
---method_config aachen_v1_1 \
+--method_config aachen_v1.1 \
 --method_string patch2pix_aachen_v1_1_ \
 --retrieval_pairs <meshloc_dataset_path>/aachen_day_night_v11/retrieval_pairs/NetVLAD_top50_underscores.txt \
 --top_k 50 \
