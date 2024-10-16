@@ -24,7 +24,7 @@ This version of MeshLoc uses the [Image Matching Toolbox](https://github.com/Gru
 git clone https://github.com/GrumpyZhou/image-matching-toolbox.git
 cd image-matching-toolbox
 git submodule update --init
-conda env create --name immatch python=3.7
+conda create --name immatch python=3.7
 conda activate immatch
 pip install Cython loguru jupyter scipy matplotlib opencv-python torch==1.13.1 torchvision pytorch-lightning faiss-gpu h5py==3.6.0
 pip install -e .
