@@ -56,7 +56,7 @@ conda activate immatch
 python3 <mesh_loc_dir>/localize.py \
 --db_image_dir <meshloc_dataset_path>/aachen_day_night_v11/images/images_db_undist_800 \
 --db_depth_image_dir <meshloc_dataset_path>/aachen_day_night_v11/db_renderings/AC14_depth_800_undist \
---colmap_model_dir <meshloc_dataset_path>/aachen_day_night_v11/db_colmap_models/800_undist \
+--colmap_model_dir <meshloc_dataset_path>/aachen_day_night_v11/db_colmap_models/800_undist_underscores \
 --query_dir <meshloc_dataset_path>/aachen_day_night_v11/images/images_q_night_800 \
 --query_list <meshloc_dataset_path>/aachen_day_night_v11/night_time_queries_with_intrinsics_800_basenames.txt \
 --out_prefix <experiment_outputs_dir_path> \
@@ -139,13 +139,15 @@ We used [Aachen v1.1](https://data.ciirc.cvut.cz/public/projects/2020VisualLocal
 
 The data derived from the above mentioned datasets (such as meshes, renderings, or COLMAP models) can be found in our data repository at [https://data.ciirc.cvut.cz/public/projects/2022MeshLoc](https://data.ciirc.cvut.cz/public/projects/2022MeshLoc).
 
-You can use [the download script](https://github.com/tsattler/meshloc_release/blob/main/download_meshloc_data.sh) to easily get the meshes and renderings. You still need to download the original datasets (photos and camera information) from their respective websites.
+You can use [the download script](https://github.com/tsattler/meshloc_release/blob/main/download_meshloc_data.sh) to easily get the meshes and renderings. The repository also contains resized and undistorted images for Aachen v1.1 dataset and corresponding COLMAP models.
 
 Script parameters:
 - if no parameters are passed, the whole data repository will be downloaded to current directory
 - **-n < all \| aachen \| 12_scenes >** - specifies which dataset to download
 - **-p \< string >** - specifies the directory where the data will be downloaded
 - **-z** - unzips everything and removes the zip files
+
+Note that all the images and renderings for Aachen v1.1 in our repository use a flattened data structure - all database images are in a single directory and their original relative path is in their names (`db/1883.jpg` --> `db_1883.jpg`), query images use only their basenames (`query/night/nexus5x_additional_night/IMG_20170702_005927.jpg` --> `IMG_20170702_005927.jpg`). We provide database COLMAP models and retrieval files for both the original data structure (`800_undist`, `NetVLAD_top50.txt`) and flattened data structure (`800_undist_underscores`, `NetVLAD_top50_underscores.txt`). All the provided images and COLMAP models are undistorted and some are resized to 800px on the longer side.
 
 ## Acknowledgements
 This repository is heavily using [PoseLib](https://github.com/vlarsson/PoseLib), [RansacLib](https://github.com/tsattler/RansacLib) and [Image Matching Toolbox](https://github.com/GrumpyZhou/image-matching-toolbox/). We would like to thank all the contributors of these repositories.
