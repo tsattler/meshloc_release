@@ -585,6 +585,7 @@ def main():
     pose_file = pose_file + "_min_" + str(args.min_ransac_iterations) + "_max_" + str(args.max_ransac_iterations)
     pose_file = pose_file + "_ref_" + str(args.refinement_range) + "_" + str(args.refinement_step)
     pose_file = pose_file + "_bias_" + str(args.bias_x) + "_" + str(args.bias_y)
+    pose_file = pose_file + ".txt"
     
     print(pose_file)
     with open(pose_file, 'w') as f:
