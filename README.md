@@ -43,6 +43,8 @@ cd image-matching-toolbox/third_party/patch2pix
 git checkout main
 ```
 
+If the CMake configuration fails with `Couldn't find CUDA library root.`, set `CUDA_HOME` (for example `export CUDA_HOME=/usr/local/cuda`) and try again.
+
 
 ## Usage
 Current implementation contains localization scripts for two datasets - [Aachen v1.1](https://data.ciirc.cvut.cz/public/projects/2020VisualLocalization/Aachen-Day-Night/) and [12 Scenes](http://graphics.stanford.edu/projects/reloc/). The scripts should be launched from `image-matching-toolbox` directory so the scripts have direct access to the feature matching configuration files. Also activate the prepared `immatch` conda environment with all necessary packages.

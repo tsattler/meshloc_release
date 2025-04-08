@@ -43,6 +43,10 @@ class CMakeBuild(build_ext):
         extdir = os.path.abspath(os.path.dirname(self.get_ext_fullpath(ext.name)))
         cmake_args = ['-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + extdir,
                       '-DPYTHON_EXECUTABLE=' + sys.executable]
+        
+        if "CUDA_HOME" in os.environ:
+            cmake_args += ['-DCMAKE_PREFIX_PATH=' + os.environ["CUDA_HOME"]]
+            cmake_args += ['-DCMAKE_CUDA_COMPILER=' + os.path.join(os.environ["CUDA_HOME"], 'bin', 'nvcc')]
 
         cfg = 'Debug' if self.debug else 'Release'
         build_args = ['--config', cfg]
